@@ -79,7 +79,7 @@ export function DiscoveryForm({ onLoading, onSuccess, onError }: DiscoveryFormPr
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5">
+    <form onSubmit={handleSubmit} className="space-y-5" aria-busy={loading}>
       <LocationInput
         value={form.destination}
         onChange={(destination) => setForm({ ...form, destination })}
@@ -87,7 +87,7 @@ export function DiscoveryForm({ onLoading, onSuccess, onError }: DiscoveryFormPr
 
       <div>
         <label className="theme-text mb-2 block text-sm font-medium">What interests you?</label>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2" role="group" aria-label="Travel interests">
           {INTEREST_TAGS.map((tag) => {
             const selected = selectedInterests.includes(tag);
             return (
@@ -95,10 +95,13 @@ export function DiscoveryForm({ onLoading, onSuccess, onError }: DiscoveryFormPr
                 key={tag}
                 type="button"
                 onClick={() => toggleInterest(tag)}
-                whileTap={{ scale: 0.95 }}
-                className={`flex items-center gap-1.5 capitalize ${selected ? "theme-chip-active" : "theme-chip"}`}
+                whileTap={{ scale: 0.97 }}
+                aria-pressed={selected}
+                className={`theme-chip inline-flex shrink-0 items-center gap-1.5 capitalize ${
+                  selected ? "theme-chip-active" : ""
+                }`}
               >
-                <span className={selected ? "" : "opacity-50"}>
+                <span className={selected ? "" : "opacity-50"} aria-hidden="true">
                   {INTEREST_ICONS[tag] ?? "✦"}
                 </span>
                 {tag.replace("-", " ")}
@@ -180,9 +183,14 @@ export function DiscoveryForm({ onLoading, onSuccess, onError }: DiscoveryFormPr
             {formError}
           </p>
         )}
-        <button type="submit" disabled={loading} className="theme-btn-primary">
+        <button type="submit" disabled={loading} className="theme-btn-primary" aria-busy={loading}>
           {loading ? "Charting your journey..." : "Discover My Cultural Journey"}
         </button>
+        {loading && (
+          <p className="sr-only" aria-live="polite">
+            Generating your cultural plan. This may take a moment.
+          </p>
+        )}
       </motion.div>
     </form>
   );

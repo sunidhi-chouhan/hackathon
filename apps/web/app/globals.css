@@ -171,16 +171,31 @@ body {
   }
 
   .theme-chip {
-    @apply rounded-full border px-3 py-1.5 text-sm transition-all duration-200;
+    @apply inline-flex shrink-0 items-center rounded-full border px-3 py-1.5 text-sm font-medium transition-colors duration-200;
     border-color: var(--border);
     background: var(--surface);
     color: var(--muted);
+  }
+
+  .theme-chip:hover {
+    border-color: var(--accent);
+    color: var(--foreground);
+  }
+
+  .theme-chip:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
   }
 
   .theme-chip-active {
     background: var(--accent);
     color: var(--accent-foreground);
     border-color: var(--accent);
+  }
+
+  .theme-chip-active:hover {
+    opacity: 0.92;
+    color: var(--accent-foreground);
   }
 
   .theme-tab {
@@ -217,5 +232,21 @@ body {
 
   .theme-divider {
     border-color: var(--border);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .animate-fade-in,
+  .animate-shimmer {
+    animation: none !important;
   }
 }

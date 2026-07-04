@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { ERROR_CODES } from "../constants";
+import { ERROR_CODES, INPUT_LIMITS } from "../constants";
 
 export const modelPresetSchema = z.enum(["fast", "balanced", "quality"]);
 
@@ -18,12 +18,15 @@ export const healthResponseSchema = z.object({
 });
 
 export const compassPlanRequestSchema = z.object({
-  destination: z.string().optional(),
-  interests: z.array(z.string()).min(1, "At least one interest is required"),
-  budget: z.string().min(1, "Budget is required"),
-  duration: z.string().min(1, "Duration is required"),
-  travelStyle: z.string().min(1, "Travel style is required"),
-  notes: z.string().optional().default(""),
+  destination: z.string().max(INPUT_LIMITS.destination).optional(),
+  interests: z
+    .array(z.string().max(INPUT_LIMITS.interestTagMax))
+    .min(1, "At least one interest is required")
+    .max(INPUT_LIMITS.interestsMax),
+  budget: z.string().min(1, "Budget is required").max(INPUT_LIMITS.budget),
+  duration: z.string().min(1, "Duration is required").max(INPUT_LIMITS.duration),
+  travelStyle: z.string().min(1, "Travel style is required").max(INPUT_LIMITS.travelStyle),
+  notes: z.string().max(INPUT_LIMITS.notes).optional().default(""),
   modelPreset: modelPresetSchema.optional(),
 });
 
@@ -124,10 +127,10 @@ export const hiddenGemsResponseSchema = z.object({
 });
 
 export const storyRequestSchema = z.object({
-  placeName: z.string().min(1),
-  era: z.string().optional(),
-  topic: z.string().optional(),
-  tone: z.string().default("immersive"),
+  placeName: z.string().min(1).max(INPUT_LIMITS.placeName),
+  era: z.string().max(100).optional(),
+  topic: z.string().max(200).optional(),
+  tone: z.string().max(50).default("immersive"),
   modelPreset: modelPresetSchema.optional(),
 });
 

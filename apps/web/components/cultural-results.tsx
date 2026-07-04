@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import type { CompassPlanResponse } from "@culturecompass/shared";
 import { PORTAL_TABS, type PortalTab } from "@/lib/constants";
 
@@ -22,7 +22,28 @@ const itemVariants = {
 
 export function CulturalResults({ plan }: CulturalResultsProps) {
   const [activeTab, setActiveTab] = useState<PortalTab>("heritage");
+  const reduceMotion = useReducedMotion();
   const dest = plan.featuredDestination;
+
+  const handleTabKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLButtonElement>, index: number) => {
+      const tabs = PORTAL_TABS;
+      let next = index;
+
+      if (e.key === "ArrowRight") {
+        next = (index + 1) % tabs.length;
+      } else if (e.key === "ArrowLeft") {
+        next = (index - 1 + tabs.length) % tabs.length;
+      } else {
+        return;
+      }
+
+      e.preventDefault();
+      setActiveTab(tabs[next].id);
+      document.getElementById(`portal-tab-${tabs[next].id}`)?.focus();
+    },
+    [],
+  );
 
   return (
     <motion.div initial={false} animate={{ opacity: 1 }} className="flex flex-col gap-5">
@@ -83,28 +104,35 @@ export function CulturalResults({ plan }: CulturalResultsProps) {
       </section>
 
       {/* Destination chips */}
-      <motion.div variants={containerVariants} initial="show" animate="show" className="flex flex-wrap gap-2">
+      <motion.div variants={containerVariants} initial="show" animate="show" className="flex flex-wrap gap-2" role="list" aria-label="Recommended destinations">
         {plan.destinations.map((d) => (
-          <motion.span
-            key={d.id}
-            variants={itemVariants}
-            className={`rounded-full px-3 py-1.5 text-xs font-medium transition-all ${
-              d.id === dest.id ? "theme-chip-active" : "theme-chip"
-            }`}
-          >
-            {d.id === dest.id && "★ "}
-            {d.name}
-          </motion.span>
+          <motion.div key={d.id} variants={itemVariants} role="listitem">
+            <Link
+              href={`/destination/${d.id}?name=${encodeURIComponent(d.name)}`}
+              className={`theme-chip ${d.id === dest.id ? "theme-chip-active" : ""}`}
+              aria-current={d.id === dest.id ? "true" : undefined}
+            >
+              {d.id === dest.id && <span aria-hidden="true">★ </span>}
+              {d.name}
+            </Link>
+          </motion.div>
         ))}
       </motion.div>
 
       {/* Tabs */}
       <div className="theme-divider border-b pb-0">
-        <div className="flex flex-wrap gap-1">
-          {PORTAL_TABS.map((tab) => (
+        <div className="flex flex-wrap gap-1" role="tablist" aria-label="Cultural exploration">
+          {PORTAL_TABS.map((tab, index) => (
             <button
               key={tab.id}
+              id={`portal-tab-${tab.id}`}
+              role="tab"
+              type="button"
+              aria-selected={activeTab === tab.id}
+              aria-controls={`portal-panel-${tab.id}`}
+              tabIndex={activeTab === tab.id ? 0 : -1}
               onClick={() => setActiveTab(tab.id)}
+              onKeyDown={(e) => handleTabKeyDown(e, index)}
               className={`theme-tab relative mb-[-1px] rounded-t-lg border-b-2 px-3 py-2.5 sm:px-4 ${
                 activeTab === tab.id
                   ? "theme-tab-active border-b-2 font-semibold"
@@ -116,7 +144,8 @@ export function CulturalResults({ plan }: CulturalResultsProps) {
                   : undefined
               }
             >
-              {tab.icon} {tab.label}
+              <span aria-hidden="true">{tab.icon} </span>
+              {tab.label}
             </button>
           ))}
         </div>
@@ -126,7 +155,7 @@ export function CulturalResults({ plan }: CulturalResultsProps) {
       <div className="min-h-[200px]">
         <AnimatePresence mode="wait">
           {activeTab === "heritage" && (
-            <TabPanel key="heritage">
+            <TabPanel key="heritage" id="portal-panel-heritage" labelledBy="portal-tab-heritage">
               <motion.div variants={containerVariants} initial="hidden" animate="show" className="space-y-4">
                 <motion.div variants={itemVariants} className="theme-card">
                   <SectionLabel icon="📜" title="Cultural Significance" />
@@ -140,7 +169,7 @@ export function CulturalResults({ plan }: CulturalResultsProps) {
                     <motion.div
                       key={item.name}
                       variants={itemVariants}
-                      whileHover={{ y: -3 }}
+                      whileHover={reduceMotion ? undefined : { y: -3 }}
                       className="theme-card group"
                     >
                       <div className="flex items-start justify-between gap-2">
@@ -150,10 +179,11 @@ export function CulturalResults({ plan }: CulturalResultsProps) {
                       <h4 className="theme-text mt-2 font-semibold">{item.name}</h4>
                       <p className="theme-text-muted mt-2 text-sm">{item.description}</p>
                       <p
-                        className="theme-text-subtle mt-3 border-t pt-2 text-xs opacity-0 transition-opacity group-hover:opacity-100"
+                        className="theme-text-subtle mt-3 border-t pt-2 text-xs"
                         style={{ borderColor: "var(--border)" }}
                       >
-                        💡 {item.tip}
+                        <span className="sr-only">Insider tip: </span>
+                        {item.tip}
                       </p>
                     </motion.div>
                   ))}
@@ -183,7 +213,7 @@ export function CulturalResults({ plan }: CulturalResultsProps) {
           )}
 
           {activeTab === "gems" && (
-            <TabPanel key="gems">
+            <TabPanel key="gems" id="portal-panel-gems" labelledBy="portal-tab-gems">
               <motion.div
                 variants={containerVariants}
                 initial="hidden"
@@ -194,20 +224,23 @@ export function CulturalResults({ plan }: CulturalResultsProps) {
                   <motion.div
                     key={gem.name}
                     variants={itemVariants}
-                    whileHover={{ scale: 1.01, y: -2 }}
+                    whileHover={reduceMotion ? undefined : { scale: 1.01, y: -2 }}
                     className="theme-card relative overflow-hidden"
                   >
                     <div
                       className="absolute right-0 top-0 h-16 w-16 rounded-bl-full opacity-10"
                       style={{ background: "var(--accent)" }}
                     />
-                    <motion.span
-                      animate={{ opacity: [0.5, 1, 0.5] }}
-                      transition={{ duration: 2.5, delay: i * 0.2, repeat: Infinity }}
-                      className="theme-badge text-[10px]"
-                    >
-                      💎 Hidden Gem
-                    </motion.span>
+                    {!reduceMotion && (
+                      <motion.span
+                        animate={{ opacity: [0.5, 1, 0.5] }}
+                        transition={{ duration: 2.5, delay: i * 0.2, repeat: Infinity }}
+                        className="theme-badge text-[10px]"
+                      >
+                        Hidden Gem
+                      </motion.span>
+                    )}
+                    {reduceMotion && <span className="theme-badge text-[10px]">Hidden Gem</span>}
                     <h4 className="theme-text mt-2 font-semibold">{gem.name}</h4>
                     <p className="theme-text-muted mt-2 text-sm">{gem.description}</p>
                     <p className="theme-text mt-2 text-sm font-medium">{gem.whyVisit}</p>
@@ -219,7 +252,7 @@ export function CulturalResults({ plan }: CulturalResultsProps) {
           )}
 
           {activeTab === "events" && (
-            <TabPanel key="events">
+            <TabPanel key="events" id="portal-panel-events" labelledBy="portal-tab-events">
               <motion.div variants={containerVariants} initial="hidden" animate="show" className="relative pl-6">
                 <div
                   className="absolute bottom-0 left-[7px] top-0 w-px"
@@ -251,7 +284,7 @@ export function CulturalResults({ plan }: CulturalResultsProps) {
           )}
 
           {activeTab === "experiences" && (
-            <TabPanel key="experiences">
+            <TabPanel key="experiences" id="portal-panel-experiences" labelledBy="portal-tab-experiences">
               <motion.div
                 variants={containerVariants}
                 initial="hidden"
@@ -262,7 +295,7 @@ export function CulturalResults({ plan }: CulturalResultsProps) {
                   <motion.div
                     key={exp.name}
                     variants={itemVariants}
-                    whileHover={{ y: -3 }}
+                    whileHover={reduceMotion ? undefined : { y: -3 }}
                     className="theme-card flex flex-col"
                   >
                     <div className="flex items-center gap-2">
@@ -309,9 +342,20 @@ function SectionLabel({ icon, title }: { icon: string; title: string }) {
   );
 }
 
-function TabPanel({ children }: { children: React.ReactNode }) {
+function TabPanel({
+  children,
+  id,
+  labelledBy,
+}: {
+  children: React.ReactNode;
+  id: string;
+  labelledBy: string;
+}) {
   return (
     <motion.div
+      role="tabpanel"
+      id={id}
+      aria-labelledby={labelledBy}
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -8 }}

@@ -4,6 +4,8 @@ import type { ModelPreset } from "@culturecompass/shared";
 import { AiGenerationError, toAiGenerationError } from "./errors";
 import { resolveModelName } from "./resolveModel";
 
+const GEMINI_TIMEOUT_MS = 55_000;
+
 let client: GoogleGenerativeAI | null = null;
 
 export function getGeminiClient(): GoogleGenerativeAI {
@@ -21,6 +23,28 @@ export function getGeminiClient(): GoogleGenerativeAI {
 
 export function getModelName(modelPreset?: ModelPreset): string {
   return resolveModelName(modelPreset);
+}
+
+async function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
+  let timeoutId: ReturnType<typeof setTimeout> | undefined;
+
+  const timeout = new Promise<never>((_, reject) => {
+    timeoutId = setTimeout(() => {
+      reject(
+        new AiGenerationError(
+          "The request took too long. Try the Fast model or simplify your request.",
+        ),
+      );
+    }, ms);
+  });
+
+  try {
+    return await Promise.race([promise, timeout]);
+  } finally {
+    if (timeoutId !== undefined) {
+      clearTimeout(timeoutId);
+    }
+  }
 }
 
 export async function generateJson<T>(
@@ -41,7 +65,7 @@ export async function generateJson<T>(
 
   for (let attempt = 0; attempt < 2; attempt++) {
     try {
-      const result = await model.generateContent(prompt);
+      const result = await withTimeout(model.generateContent(prompt), GEMINI_TIMEOUT_MS);
       const text = result.response.text();
       const json = extractJson(text);
 

@@ -4,7 +4,12 @@ interface LoadingStateProps {
 
 export function LoadingState({ message = "Discovering cultural treasures..." }: LoadingStateProps) {
   return (
-    <div className="flex flex-col items-center justify-center gap-4 py-16">
+    <div
+      className="flex flex-col items-center justify-center gap-4 py-16"
+      role="status"
+      aria-live="polite"
+      aria-busy="true"
+    >
       <div
         className="h-10 w-10 animate-spin rounded-full border-4"
         style={{
