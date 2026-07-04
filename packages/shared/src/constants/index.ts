@@ -8,7 +8,7 @@ export const MODEL_PRESETS = {
 
 export type ModelPreset = keyof typeof MODEL_PRESETS;
 
-export const DEFAULT_MODEL_PRESET: ModelPreset = "fast";
+export const DEFAULT_MODEL_PRESET: ModelPreset = "balanced";
 
 export const MODEL_PRESET_OPTIONS: ReadonlyArray<{
   id: ModelPreset;

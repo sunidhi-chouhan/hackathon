@@ -18,6 +18,9 @@
   --hero-from: #f5f5f4;
   --hero-to: #e7e5e4;
   --card-hover: rgba(12, 10, 9, 0.04);
+  --option-bg: #ffffff;
+  --option-fg: #0c0a09;
+  color-scheme: light;
 }
 
 .dark {
@@ -36,6 +39,9 @@
   --hero-from: #1c1917;
   --hero-to: #0c0a09;
   --card-hover: rgba(255, 255, 255, 0.06);
+  --option-bg: #1c1917;
+  --option-fg: #fafaf9;
+  color-scheme: dark;
 }
 
 body {
@@ -125,6 +131,33 @@ body {
 
   .theme-input::placeholder {
     color: var(--muted-foreground);
+  }
+
+  .theme-select {
+    @apply theme-input cursor-pointer capitalize;
+    appearance: none;
+    padding-right: 2.5rem;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2378716c'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 1rem;
+    color-scheme: light;
+  }
+
+  .dark .theme-select {
+    color-scheme: dark;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23a8a29e'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
+  }
+
+  .theme-select option {
+    background-color: var(--option-bg);
+    color: var(--option-fg);
+  }
+
+  .theme-select option:checked,
+  .theme-select option:hover {
+    background-color: var(--accent);
+    color: var(--accent-foreground);
   }
 
   .theme-btn-primary {

@@ -135,7 +135,7 @@ export function DiscoveryForm({ onLoading, onSuccess, onError }: DiscoveryFormPr
           id="travelStyle"
           value={form.travelStyle}
           onChange={(e) => setForm({ ...form, travelStyle: e.target.value })}
-          className="theme-input capitalize"
+          className="theme-select"
         >
           {TRAVEL_STYLES.map((style) => (
             <option key={style} value={style}>
@@ -152,7 +152,7 @@ export function DiscoveryForm({ onLoading, onSuccess, onError }: DiscoveryFormPr
           onChange={(e) =>
             setForm({ ...form, modelPreset: e.target.value as ModelPreset })
           }
-          className="theme-input"
+          className="theme-select normal-case"
         >
           {MODEL_PRESET_OPTIONS.map((option) => (
             <option key={option.id} value={option.id}>
