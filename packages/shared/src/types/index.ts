@@ -1,4 +1,5 @@
 import { z } from "zod";
+import type { ModelPreset } from "../constants";
 import {
   apiErrorSchema,
   healthResponseSchema,
@@ -52,3 +53,4 @@ export type Heritage = z.infer<typeof heritageSchema>;
 export type Event = z.infer<typeof eventSchema>;
 export type Experience = z.infer<typeof experienceSchema>;
 export type StorySnippet = z.infer<typeof storySnippetSchema>;
+export type { ModelPreset };

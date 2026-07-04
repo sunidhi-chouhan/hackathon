@@ -4,12 +4,44 @@
 
 :root {
   --background: #fafaf9;
-  --foreground: #1c1917;
+  --foreground: #0c0a09;
+  --surface: rgba(255, 255, 255, 0.9);
+  --surface-elevated: #ffffff;
+  --muted: #57534e;
+  --muted-foreground: #78716c;
+  --border: rgba(12, 10, 9, 0.12);
+  --accent: #0c0a09;
+  --accent-foreground: #fafaf9;
+  --accent-muted: rgba(12, 10, 9, 0.08);
+  --grid-line: rgba(12, 10, 9, 0.06);
+  --glow: rgba(12, 10, 9, 0.04);
+  --hero-from: #f5f5f4;
+  --hero-to: #e7e5e4;
+  --card-hover: rgba(12, 10, 9, 0.04);
+}
+
+.dark {
+  --background: #0c0a09;
+  --foreground: #fafaf9;
+  --surface: rgba(255, 255, 255, 0.05);
+  --surface-elevated: #1c1917;
+  --muted: #a8a29e;
+  --muted-foreground: #78716c;
+  --border: rgba(255, 255, 255, 0.1);
+  --accent: #fafaf9;
+  --accent-foreground: #0c0a09;
+  --accent-muted: rgba(255, 255, 255, 0.08);
+  --grid-line: rgba(255, 255, 255, 0.04);
+  --glow: rgba(255, 255, 255, 0.06);
+  --hero-from: #1c1917;
+  --hero-to: #0c0a09;
+  --card-hover: rgba(255, 255, 255, 0.06);
 }
 
 body {
   color: var(--foreground);
   background: var(--background);
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 @keyframes fade-in {
@@ -24,5 +56,133 @@ body {
 }
 
 .animate-fade-in {
-  animation: fade-in 0.4s ease-out forwards;
+  animation: fade-in 0.5s ease-out forwards;
+  opacity: 1;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--accent-muted) 0%,
+    var(--border) 50%,
+    var(--accent-muted) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+.bg-dashboard {
+  background-color: var(--background);
+  background-image:
+    radial-gradient(ellipse at 20% 0%, var(--glow) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 100%, var(--glow) 0%, transparent 50%),
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: 100% 100%, 100% 100%, 40px 40px, 40px 40px;
+}
+
+@layer components {
+  .theme-surface {
+    @apply border backdrop-blur-xl transition-colors duration-300;
+    background: var(--surface);
+    border-color: var(--border);
+  }
+
+  .theme-surface-elevated {
+    @apply border backdrop-blur-xl transition-colors duration-300;
+    background: var(--surface-elevated);
+    border-color: var(--border);
+  }
+
+  .theme-text {
+    color: var(--foreground);
+  }
+
+  .theme-text-muted {
+    color: var(--muted);
+  }
+
+  .theme-text-subtle {
+    color: var(--muted-foreground);
+  }
+
+  .theme-input {
+    @apply w-full rounded-xl border px-3 py-2.5 text-sm transition-colors duration-200 focus:outline-none focus:ring-2;
+    background: var(--surface);
+    border-color: var(--border);
+    color: var(--foreground);
+  }
+
+  .theme-input:focus {
+    border-color: var(--accent);
+    --tw-ring-color: var(--accent-muted);
+  }
+
+  .theme-input::placeholder {
+    color: var(--muted-foreground);
+  }
+
+  .theme-btn-primary {
+    @apply w-full rounded-xl py-3 text-base font-semibold transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-50;
+    background: var(--accent);
+    color: var(--accent-foreground);
+  }
+
+  .theme-btn-primary:hover:not(:disabled) {
+    opacity: 0.9;
+  }
+
+  .theme-chip {
+    @apply rounded-full border px-3 py-1.5 text-sm transition-all duration-200;
+    border-color: var(--border);
+    background: var(--surface);
+    color: var(--muted);
+  }
+
+  .theme-chip-active {
+    background: var(--accent);
+    color: var(--accent-foreground);
+    border-color: var(--accent);
+  }
+
+  .theme-tab {
+    @apply rounded-lg px-3 py-2 text-xs font-medium transition-all sm:text-sm;
+    color: var(--muted);
+  }
+
+  .theme-tab:hover {
+    background: var(--accent-muted);
+    color: var(--foreground);
+  }
+
+  .theme-tab-active {
+    background: var(--accent);
+    color: var(--accent-foreground);
+  }
+
+  .theme-card {
+    @apply rounded-xl border p-4 transition-all duration-200;
+    background: var(--surface);
+    border-color: var(--border);
+  }
+
+  .theme-card:hover {
+    background: var(--card-hover);
+    border-color: var(--accent);
+  }
+
+  .theme-badge {
+    @apply inline-block rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wider;
+    background: var(--accent-muted);
+    color: var(--foreground);
+  }
+
+  .theme-divider {
+    border-color: var(--border);
+  }
 }

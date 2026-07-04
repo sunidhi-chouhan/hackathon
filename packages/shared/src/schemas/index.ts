@@ -1,6 +1,8 @@
 import { z } from "zod";
 import { ERROR_CODES } from "../constants";
 
+export const modelPresetSchema = z.enum(["fast", "balanced", "quality"]);
+
 export const apiErrorSchema = z.object({
   error: z.string(),
   code: z.enum([
@@ -16,13 +18,13 @@ export const healthResponseSchema = z.object({
 });
 
 export const compassPlanRequestSchema = z.object({
+  destination: z.string().optional(),
   interests: z.array(z.string()).min(1, "At least one interest is required"),
   budget: z.string().min(1, "Budget is required"),
   duration: z.string().min(1, "Duration is required"),
   travelStyle: z.string().min(1, "Travel style is required"),
-  startDate: z.string().optional(),
-  endDate: z.string().optional(),
   notes: z.string().optional().default(""),
+  modelPreset: modelPresetSchema.optional(),
 });
 
 export const destinationSchema = z.object({
@@ -93,6 +95,7 @@ export const destinationsRequestSchema = z.object({
   budget: z.string().min(1),
   duration: z.string().min(1),
   travelStyle: z.string().min(1),
+  modelPreset: modelPresetSchema.optional(),
 });
 
 export const destinationsResponseSchema = z.object({
@@ -103,6 +106,7 @@ export const attractionsRequestSchema = z.object({
   destination: z.string().min(1),
   interests: z.array(z.string()).min(1),
   groupSize: z.number().int().min(1).default(1),
+  modelPreset: modelPresetSchema.optional(),
 });
 
 export const attractionsResponseSchema = z.object({
@@ -112,6 +116,7 @@ export const attractionsResponseSchema = z.object({
 export const hiddenGemsRequestSchema = z.object({
   destination: z.string().min(1),
   vibe: z.string().min(1),
+  modelPreset: modelPresetSchema.optional(),
 });
 
 export const hiddenGemsResponseSchema = z.object({
@@ -123,6 +128,7 @@ export const storyRequestSchema = z.object({
   era: z.string().optional(),
   topic: z.string().optional(),
   tone: z.string().default("immersive"),
+  modelPreset: modelPresetSchema.optional(),
 });
 
 export const storyResponseSchema = z.object({
@@ -138,6 +144,7 @@ export const storyResponseSchema = z.object({
 
 export const heritageRequestSchema = z.object({
   destination: z.string().min(1),
+  modelPreset: modelPresetSchema.optional(),
 });
 
 export const heritageResponseSchema = heritageSchema;
@@ -146,6 +153,7 @@ export const eventsRequestSchema = z.object({
   destination: z.string().min(1),
   startDate: z.string().optional(),
   endDate: z.string().optional(),
+  modelPreset: modelPresetSchema.optional(),
 });
 
 export const eventsResponseSchema = z.object({
@@ -155,6 +163,7 @@ export const eventsResponseSchema = z.object({
 export const experiencesRequestSchema = z.object({
   destination: z.string().min(1),
   preferences: z.array(z.string()).default([]),
+  modelPreset: modelPresetSchema.optional(),
 });
 
 export const experiencesResponseSchema = z.object({

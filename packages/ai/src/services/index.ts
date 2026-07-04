@@ -37,51 +37,59 @@ import { buildExperiencesPrompt } from "../prompts/experiences";
 export async function generateCompassPlan(
   input: CompassPlanRequest,
 ): Promise<CompassPlanResponse> {
-  const prompt = buildCompassPlanPrompt(input);
-  return generateJson(prompt, (raw) => compassPlanResponseSchema.parse(raw));
+  const { modelPreset, ...planInput } = input;
+  const prompt = buildCompassPlanPrompt(planInput);
+  return generateJson(prompt, (raw) => compassPlanResponseSchema.parse(raw), { modelPreset });
 }
 
 export async function generateDestinations(
   input: DestinationsRequest,
 ): Promise<DestinationsResponse> {
-  const prompt = buildDestinationsPrompt(input);
-  return generateJson(prompt, (raw) => destinationsResponseSchema.parse(raw));
+  const { modelPreset, ...requestInput } = input;
+  const prompt = buildDestinationsPrompt(requestInput);
+  return generateJson(prompt, (raw) => destinationsResponseSchema.parse(raw), { modelPreset });
 }
 
 export async function generateAttractions(
   input: AttractionsRequest,
 ): Promise<AttractionsResponse> {
-  const prompt = buildAttractionsPrompt(input);
-  return generateJson(prompt, (raw) => attractionsResponseSchema.parse(raw));
+  const { modelPreset, ...requestInput } = input;
+  const prompt = buildAttractionsPrompt(requestInput);
+  return generateJson(prompt, (raw) => attractionsResponseSchema.parse(raw), { modelPreset });
 }
 
 export async function generateHiddenGems(
   input: HiddenGemsRequest,
 ): Promise<HiddenGemsResponse> {
-  const prompt = buildHiddenGemsPrompt(input);
-  return generateJson(prompt, (raw) => hiddenGemsResponseSchema.parse(raw));
+  const { modelPreset, ...requestInput } = input;
+  const prompt = buildHiddenGemsPrompt(requestInput);
+  return generateJson(prompt, (raw) => hiddenGemsResponseSchema.parse(raw), { modelPreset });
 }
 
 export async function generateStory(input: StoryRequest): Promise<StoryResponse> {
-  const prompt = buildStoryPrompt(input);
-  return generateJson(prompt, (raw) => storyResponseSchema.parse(raw));
+  const { modelPreset, ...requestInput } = input;
+  const prompt = buildStoryPrompt(requestInput);
+  return generateJson(prompt, (raw) => storyResponseSchema.parse(raw), { modelPreset });
 }
 
 export async function generateHeritage(
   input: HeritageRequest,
 ): Promise<HeritageResponse> {
-  const prompt = buildHeritagePrompt(input);
-  return generateJson(prompt, (raw) => heritageResponseSchema.parse(raw));
+  const { modelPreset, ...requestInput } = input;
+  const prompt = buildHeritagePrompt(requestInput);
+  return generateJson(prompt, (raw) => heritageResponseSchema.parse(raw), { modelPreset });
 }
 
 export async function generateEvents(input: EventsRequest): Promise<EventsResponse> {
-  const prompt = buildEventsPrompt(input);
-  return generateJson(prompt, (raw) => eventsResponseSchema.parse(raw));
+  const { modelPreset, ...requestInput } = input;
+  const prompt = buildEventsPrompt(requestInput);
+  return generateJson(prompt, (raw) => eventsResponseSchema.parse(raw), { modelPreset });
 }
 
 export async function generateExperiences(
   input: ExperiencesRequest,
 ): Promise<ExperiencesResponse> {
-  const prompt = buildExperiencesPrompt(input);
-  return generateJson(prompt, (raw) => experiencesResponseSchema.parse(raw));
+  const { modelPreset, ...requestInput } = input;
+  const prompt = buildExperiencesPrompt(requestInput);
+  return generateJson(prompt, (raw) => experiencesResponseSchema.parse(raw), { modelPreset });
 }

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useParams, useSearchParams } from "next/navigation";
 import { LoadingState, ErrorState, Card } from "@culturecompass/ui";
 import { fetchStory } from "@/lib/api-client";
+import { getStoredModelPreset } from "@/lib/model-preset";
 import type { StoryResponse } from "@culturecompass/shared";
 
 function StoryContent() {
@@ -23,6 +24,7 @@ function StoryContent() {
         const result = await fetchStory({
           placeName,
           tone: "immersive",
+          modelPreset: getStoredModelPreset(),
         });
         setStory(result);
       } catch (err) {

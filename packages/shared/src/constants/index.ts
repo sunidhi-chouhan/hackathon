@@ -1,5 +1,37 @@
 export const DEFAULT_GEMINI_MODEL = "gemini-2.0-flash";
 
+export const MODEL_PRESETS = {
+  fast: "gemini-2.0-flash",
+  balanced: "gemini-2.5-flash",
+  quality: "gemini-1.5-pro",
+} as const;
+
+export type ModelPreset = keyof typeof MODEL_PRESETS;
+
+export const DEFAULT_MODEL_PRESET: ModelPreset = "fast";
+
+export const MODEL_PRESET_OPTIONS: ReadonlyArray<{
+  id: ModelPreset;
+  label: string;
+  description: string;
+}> = [
+  {
+    id: "fast",
+    label: "Fast",
+    description: "Quick responses — best for demos and slow connections",
+  },
+  {
+    id: "balanced",
+    label: "Balanced",
+    description: "Better quality with moderate speed",
+  },
+  {
+    id: "quality",
+    label: "Quality",
+    description: "Richest storytelling — may take longer",
+  },
+];
+
 export const TRAVEL_STYLES = [
   "adventurous",
   "relaxed",

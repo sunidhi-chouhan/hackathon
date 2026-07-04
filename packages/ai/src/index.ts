@@ -1,4 +1,5 @@
 export { getGeminiClient, getModelName, generateJson } from "./client";
+export { resolveModelName } from "./resolveModel";
 export {
   generateCompassPlan,
   generateDestinations,

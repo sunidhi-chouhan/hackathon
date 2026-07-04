@@ -1,10 +1,9 @@
 import type { CompassPlanRequest } from "@culturecompass/shared";
 
 export function buildCompassPlanPrompt(input: CompassPlanRequest): string {
-  const dateRange =
-    input.startDate && input.endDate
-      ? `${input.startDate} to ${input.endDate}`
-      : "flexible dates";
+  const destinationLine = input.destination?.trim()
+    ? `The traveler wants to visit: ${input.destination.trim()}. Feature this destination as the primary focus if appropriate, or suggest it among recommendations.`
+    : "No specific destination provided — recommend the best cultural destinations based on their profile.";
 
   return `You are CultureCompass AI, a GenAI travel assistant specializing in destination discovery and authentic cultural experiences.
 
@@ -64,7 +63,7 @@ Generate a comprehensive cultural travel plan as ONLY valid JSON matching this e
   ],
   "storySnippet": {
     "title": "Evocative story title about the featured destination",
-    "preview": "2-3 sentence immersive story preview that draws the reader in",
+    "preview": "A rich 4-6 sentence immersive legend or cultural story that reads like opening lines of a travel narrative — vivid, poetic, and emotionally engaging",
     "tone": "immersive"
   }
 }
@@ -74,13 +73,16 @@ Traveler profile:
 - Budget: ${input.budget}
 - Duration: ${input.duration}
 - Travel style: ${input.travelStyle}
-- Dates: ${dateRange}
 - Notes: ${input.notes || "None"}
+
+Destination preference:
+${destinationLine}
 
 Requirements:
 - Return 3 destinations ranked by fit; featuredDestination must be the best match
 - All content for featuredDestination: 4 attractions, 3 hidden gems, 3 events, 3 experiences
 - Heritage section focused on featuredDestination
+- storySnippet.preview should feel like local lore — a legend, myth, or historical vignette
 - Use realistic, culturally respectful content
 - IDs must be lowercase kebab-case derived from destination name
 - Return ONLY the JSON object, no markdown or extra text`;

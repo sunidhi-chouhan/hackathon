@@ -1,5 +1,6 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { DEFAULT_GEMINI_MODEL } from "@culturecompass/shared";
+import type { ModelPreset } from "@culturecompass/shared";
+import { resolveModelName } from "./resolveModel";
 
 let client: GoogleGenerativeAI | null = null;
 
@@ -16,17 +17,18 @@ export function getGeminiClient(): GoogleGenerativeAI {
   return client;
 }
 
-export function getModelName(): string {
-  return process.env.GEMINI_MODEL || DEFAULT_GEMINI_MODEL;
+export function getModelName(modelPreset?: ModelPreset): string {
+  return resolveModelName(modelPreset);
 }
 
 export async function generateJson<T>(
   prompt: string,
   parse: (raw: unknown) => T,
+  options?: { modelPreset?: ModelPreset },
 ): Promise<T> {
   const genAI = getGeminiClient();
   const model = genAI.getGenerativeModel({
-    model: getModelName(),
+    model: resolveModelName(options?.modelPreset),
     generationConfig: {
       temperature: 0.7,
       responseMimeType: "application/json",
