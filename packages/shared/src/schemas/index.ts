@@ -3,6 +3,8 @@ import { ERROR_CODES, INPUT_LIMITS } from "../constants";
 
 export const modelPresetSchema = z.enum(["fast", "balanced", "quality"]);
 
+export const lensModeSchema = z.enum(["tourist", "local"]);
+
 export const apiErrorSchema = z.object({
   error: z.string(),
   code: z.enum([
@@ -28,6 +30,7 @@ export const compassPlanRequestSchema = z.object({
   travelStyle: z.string().min(1, "Travel style is required").max(INPUT_LIMITS.travelStyle),
   notes: z.string().max(INPUT_LIMITS.notes).optional().default(""),
   modelPreset: modelPresetSchema.optional(),
+  lensMode: lensModeSchema.optional().default("tourist"),
 });
 
 export const destinationSchema = z.object({
@@ -79,7 +82,17 @@ export const experienceSchema = z.object({
 export const storySnippetSchema = z.object({
   title: z.string(),
   preview: z.string(),
+  narrative: z.string(),
   tone: z.string(),
+});
+
+export const dashboardMetaSchema = z.object({
+  weather: z.string(),
+  culturalRating: z.number().min(1).max(10),
+  aiMatchScore: z.number().int().min(50).max(100),
+  foodHighlights: z.array(z.string()).min(1).max(8),
+  localTips: z.array(z.string()).min(1).max(8),
+  shoppingGuide: z.array(z.string()).min(1).max(8),
 });
 
 export const compassPlanResponseSchema = z.object({
@@ -91,6 +104,7 @@ export const compassPlanResponseSchema = z.object({
   events: z.array(eventSchema),
   experiences: z.array(experienceSchema),
   storySnippet: storySnippetSchema,
+  dashboard: dashboardMetaSchema.optional(),
 });
 
 export const destinationsRequestSchema = z.object({

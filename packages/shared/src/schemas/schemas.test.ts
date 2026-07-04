@@ -46,6 +46,30 @@ describe("compassPlanRequestSchema", () => {
     });
     assert.equal(result.success, false);
   });
+
+  it("defaults lens mode to tourist", () => {
+    const result = compassPlanRequestSchema.safeParse({
+      interests: ["history"],
+      budget: "$1000",
+      duration: "3 days",
+      travelStyle: "cultural",
+    });
+    assert.equal(result.success, true);
+    if (result.success) {
+      assert.equal(result.data.lensMode, "tourist");
+    }
+  });
+
+  it("accepts local lens mode", () => {
+    const result = compassPlanRequestSchema.safeParse({
+      interests: ["history"],
+      budget: "$1000",
+      duration: "3 days",
+      travelStyle: "cultural",
+      lensMode: "local",
+    });
+    assert.equal(result.success, true);
+  });
 });
 
 describe("compassPlanResponseSchema", () => {
@@ -71,7 +95,7 @@ describe("compassPlanResponseSchema", () => {
       },
       events: [],
       experiences: [],
-      storySnippet: { title: "T", preview: "P", tone: "immersive" },
+      storySnippet: { title: "T", preview: "P", narrative: "You arrive.", tone: "immersive" },
     });
     assert.equal(result.success, false);
   });

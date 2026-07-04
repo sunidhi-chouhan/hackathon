@@ -10,50 +10,61 @@ Built for the **Google Build with AI / PromptWars** hackathon.
 
 ## For judges — quick demo flow
 
-1. Open the home page — two-column **Plan Your Cultural Journey** + **Cultural Portal**
-2. Select **Balanced** AI model (recommended for best quality/speed tradeoff)
-3. Pick interests (e.g. history, food, festivals), enter budget & duration
-4. Click **Discover My Cultural Journey** — portal shows animated loading, then results
-5. Explore tabs: **Heritage & Attractions**, **Hidden Gems**, **Local Events**, **Authentic Experiences**
-6. Click **Read the full legend** for immersive AI storytelling
-7. Toggle **dark/light theme** in the header
+1. Open the **landing page** — immersive hero with example destinations (Jaipur, Kyoto, Bali, Rome, Kerala)
+2. Click **Start Exploring** or search a destination → conversational planner at `/plan`
+3. Answer one question at a time: destination → interests → companions → budget → duration
+4. Click **Generate Journey** — Gemini builds a full cultural plan
+5. Explore the **Journey Dashboard**: hero stats, **Story Mode** (parchment narrative + Play/Pause speech), **Local Lens** toggle (Tourist vs Local View), and nine insight cards
+6. Toggle **Local View** — recommendations refresh from a local resident's perspective
+7. Tap **Play Story** — browser speech synthesis reads the narrative with live word highlighting
+8. Toggle **dark/light theme** in the header
 
 ### Problem statement alignment
 
 | Requirement | Implementation |
 |-------------|----------------|
-| Recommend attractions | Heritage tab — categorized attractions with insider tips |
-| Uncover hidden gems | Hidden Gems tab — local tips and why-visit rationale |
-| Immersive storytelling | Hero quote + `/story/[id]` full narrative page |
-| Promote heritage | Heritage highlights, traditions, etiquette, cultural significance |
-| Suggest local events | Events tab — timeline of festivals and happenings |
-| Authentic experiences | Experiences tab — workshops, food tours, authenticity notes |
+| Recommend attractions | Tourist View in Local Lens + Heritage & Attractions cards |
+| Uncover hidden gems | Local View surfaces hidden cafes, markets, street food, workshops |
+| Immersive storytelling | **Story Mode** — Gemini narrative on parchment card with TTS playback |
+| Promote heritage | Heritage card + traditions, etiquette, cultural significance |
+| Suggest local events | Events card + community festivals in Local View |
+| Authentic experiences | Experiences card + artisan workshops, local rituals |
 | GenAI-powered | All content generated server-side via Google Gemini |
+
+### AI evaluation criteria
+
+| Criterion | How we address it |
+|-----------|---------------------|
+| **Code quality** | Turborepo monorepo, strict TypeScript, layered packages (`shared` / `ai` / `web` / `ui`), consistent API error handling, ESLint + CI |
+| **Problem alignment** | Every feature maps to the hackathon brief; README demo flow matches the live app |
+| **Accessibility** | Semantic HTML, skip link, ARIA tabs/toggles/live regions, keyboard controls, `prefers-reduced-motion` |
+| **Testability** | **55+ unit tests** (Node.js test runner) across schemas, prompts, API utils, sanitization, rate limits, helpers; CI on every push |
+| **Efficiency** | Single composite `/api/compass/plan` call, Gemini JSON mode, client singleton, 55s timeout, bounded inputs |
+| **Security** | Server-only API key, Zod input limits, prompt sanitization + XML wrapping, rate limiting, security headers |
 
 ---
 
-## What’s in the deployed version
+## Features
 
-### Core experience
-- **Interactive dashboard** — two-column layout: planning form (left) + Cultural Portal (right)
-- **AI journey planner** — one submit generates a full cultural plan in the portal
-- **Location search** — “Where are you going?” input with suggested destinations (blank = AI picks for you)
-- **Interest-based discovery** — tags for history, art, food, festivals, local life, etc.
-- **Dark / Light theme toggle** — black & white theme with smooth switching (saved in browser)
+### Conversational planner (`/plan`)
+Chat-style flow — one question at a time, then **Generate Journey**.
 
-### AI-generated results UI
-- **Local Lore & Storytelling** hero with immersive quote/story preview
-- **Tabbed exploration:** Heritage & Attractions, Hidden Gems, Local Events, Authentic Experiences
-- **Animated loading** — parchment-style skeleton while Gemini generates
-- **Staggered card animations** for results (respects `prefers-reduced-motion`)
+### Journey Dashboard
+- Hero image with destination stats (weather, season, cultural rating, AI match)
+- **Story Mode** — immersive second-person narrative in a parchment card; Play/Pause via Web Speech API with word highlighting
+- **Local Lens** — Tourist View (famous attractions) vs Local View (hidden gems, markets, street food, neighborhood temples, artisan workshops, community festivals); Gemini prompt adapts automatically
+- Nine staggered insight cards with detail sheets
+
+### Landing page (`/`)
+Full-viewport hero, animated globe, floating cultural icons, destination search, feature cards.
 
 ### AI model selection
 
-| Option   | Model              | When to use |
-|----------|--------------------|-------------|
-| Fast     | `gemini-2.0-flash` | Quick demos, slower networks |
-| **Balanced** | **`gemini-2.5-flash`** | **Better quality, moderate speed (recommended)** |
-| Quality  | `gemini-1.5-pro`   | Richest stories; may take longer |
+| Option | Model | When to use |
+|--------|-------|-------------|
+| Fast | `gemini-2.0-flash` | Quick demos |
+| **Balanced** | **`gemini-2.5-flash`** | **Recommended** |
+| Quality | `gemini-1.5-pro` | Richest narratives |
 
 ---
 
@@ -73,32 +84,32 @@ Built for the **Google Build with AI / PromptWars** hackathon.
 ## Project structure
 
 ```
-├── apps/web/           # Next.js app (UI + /api routes)
-├── packages/shared/    # Schemas, types, constants
-├── packages/ai/        # Gemini client, prompts, services
-└── packages/ui/        # Shared UI components
+├── apps/web/              # Next.js app (UI + /api routes)
+│   ├── components/
+│   │   ├── dashboard/     # Journey dashboard, Local Lens, cards
+│   │   ├── planner/       # Conversational planner session
+│   │   ├── story/         # Story Mode parchment + TTS
+│   │   └── landing/       # Immersive home page
+│   ├── hooks/             # use-story-speech
+│   └── lib/               # API client, helpers, tests
+├── packages/shared/       # Schemas, types, constants
+├── packages/ai/           # Gemini client, prompts, services
+└── packages/ui/           # Shared UI components
 ```
 
 ---
 
-## Gen AI usage (summary)
+## Gen AI usage
 
 All AI runs **server-side** via `GEMINI_API_KEY` (never exposed to the browser).
 
 | Feature | API route | Gemini service |
 |---------|-----------|----------------|
 | Full cultural plan | `POST /api/compass/plan` | `generateCompassPlan()` |
-| Destinations | `POST /api/discover/destinations` | `generateDestinations()` |
-| Attractions | `POST /api/discover/attractions` | `generateAttractions()` |
-| Hidden gems | `POST /api/discover/hidden-gems` | `generateHiddenGems()` |
-| Immersive story | `POST /api/culture/story` | `generateStory()` |
-| Heritage | `POST /api/culture/heritage` | `generateHeritage()` |
-| Events | `POST /api/culture/events` | `generateEvents()` |
-| Experiences | `POST /api/culture/experiences` | `generateExperiences()` |
+| Immersive story (deep dive) | `POST /api/culture/story` | `generateStory()` |
+| Destinations, attractions, gems, heritage, events, experiences | `/api/discover/*`, `/api/culture/*` | Granular services |
 
-Granular APIs support extensibility; the dashboard uses the composite `/api/compass/plan` for a single fast round-trip.
-
-Prompts live in `packages/ai/src/prompts/`. User input is sanitized and wrapped in XML delimiters before interpolation. Responses are structured JSON, validated with Zod.
+The dashboard uses composite `/api/compass/plan` for one fast round-trip. Prompts live in `packages/ai/src/prompts/`. User input is sanitized and wrapped in XML delimiters. Responses are structured JSON validated with Zod. **Local Lens** and **Story Mode** fields are generated in the same call.
 
 ---
 
@@ -106,11 +117,11 @@ Prompts live in `packages/ai/src/prompts/`. User input is sanitized and wrapped 
 
 | Area | Approach |
 |------|----------|
-| **Code quality** | Turborepo monorepo, strict TypeScript, layered packages, consistent API error handling |
-| **Testing** | Node.js test runner — **48 unit tests** across schemas, API utils, AI sanitization, rate limits; CI via GitHub Actions (`pnpm test`) |
-| **Security** | Server-only API key, Zod input limits, prompt sanitization, rate limiting on POST `/api/*`, security headers |
-| **Accessibility** | Semantic HTML, form labels, ARIA tabs, `aria-pressed` toggles, skip link, `prefers-reduced-motion`, live regions |
-| **Efficiency** | Single composite AI call, Gemini JSON mode, client singleton, 55s timeout, bounded input lengths |
+| **Code quality** | Monorepo layers, strict TS, ESLint (`next/core-web-vitals`), Prettier, CI pipeline |
+| **Testing** | Node.js test runner — schemas, lens constants, compass prompts, API utils, AI sanitization, rate limits, dashboard/story helpers |
+| **Security** | Server-only API key, Zod limits, prompt injection filtering, rate limiting on POST `/api/*`, security headers |
+| **Accessibility** | Skip link, form labels, ARIA tabs (`Local Lens`), `aria-live` regions (`Story Mode`), `aria-pressed` toggles, reduced-motion |
+| **Efficiency** | Single AI call per journey, JSON mode, singleton client, bounded input lengths |
 
 ---
 
@@ -129,7 +140,8 @@ pnpm dev:web
 pnpm dev:web      # Start development server
 pnpm build        # Production build
 pnpm typecheck    # TypeScript check
-pnpm test         # Run Vitest tests
+pnpm lint         # ESLint
+pnpm test         # Run all package tests
 ```
 
 ---

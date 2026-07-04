@@ -67,3 +67,12 @@ export const ERROR_CODES = {
 export type ErrorCode = (typeof ERROR_CODES)[keyof typeof ERROR_CODES];
 
 export { INPUT_LIMITS } from "./limits";
+export {
+  LENS_MODES,
+  DEFAULT_LENS_MODE,
+  LOCAL_LENS_LABEL,
+  LENS_MODE_LABELS,
+  LENS_MODE_DESCRIPTIONS,
+  LOCAL_LENS_CATEGORIES,
+  type LensMode,
+} from "./lens";

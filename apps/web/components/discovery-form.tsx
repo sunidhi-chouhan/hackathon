@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import {
+  DEFAULT_LENS_MODE,
   DEFAULT_MODEL_PRESET,
   INTEREST_TAGS,
   MODEL_PRESET_OPTIONS,
@@ -61,6 +62,7 @@ export function DiscoveryForm({ onLoading, onSuccess, onError }: DiscoveryFormPr
       travelStyle: form.travelStyle,
       modelPreset: form.modelPreset,
       notes: form.notes,
+      lensMode: DEFAULT_LENS_MODE,
     };
 
     setLoading(true);

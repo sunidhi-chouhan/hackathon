@@ -26,6 +26,7 @@ import {
   eventSchema,
   experienceSchema,
   storySnippetSchema,
+  dashboardMetaSchema,
 } from "../schemas";
 
 export type ApiError = z.infer<typeof apiErrorSchema>;
@@ -53,4 +54,5 @@ export type Heritage = z.infer<typeof heritageSchema>;
 export type Event = z.infer<typeof eventSchema>;
 export type Experience = z.infer<typeof experienceSchema>;
 export type StorySnippet = z.infer<typeof storySnippetSchema>;
+export type DashboardMeta = z.infer<typeof dashboardMetaSchema>;
 export type { ModelPreset };

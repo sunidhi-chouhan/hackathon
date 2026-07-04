@@ -42,15 +42,23 @@ export default function DestinationPage() {
     }
   }, [id]);
 
-  if (loading) return <LoadingState />;
+  if (loading) {
+    return (
+      <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+        <LoadingState />
+      </div>
+    );
+  }
   if (error) {
     return (
-      <div className="mx-auto max-w-lg">
-        <ErrorState message={error} />
-        <div className="mt-4 text-center">
-          <Link href="/" className="theme-text text-sm underline-offset-4 hover:underline">
-            Start a new discovery
-          </Link>
+      <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-lg">
+          <ErrorState message={error} />
+          <div className="mt-4 text-center">
+            <Link href="/" className="theme-text text-sm underline-offset-4 hover:underline">
+              Start a new discovery
+            </Link>
+          </div>
         </div>
       </div>
     );
@@ -61,7 +69,7 @@ export default function DestinationPage() {
   const isFeatured = plan.featuredDestination.id === destination.id;
 
   return (
-    <div className="space-y-8">
+    <div className="mx-auto max-w-7xl space-y-8 px-4 py-10 sm:px-6 lg:px-8">
       <div>
         <Link href="/" className="theme-text text-sm underline-offset-4 hover:underline">
           ← Back to results
