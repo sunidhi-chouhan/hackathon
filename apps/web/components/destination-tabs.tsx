@@ -1,7 +1,6 @@
 "use client";
 
-import { useState } from "react";
-import { Card } from "@culturecompass/ui";
+import { useState, useCallback } from "react";
 
 type Tab = "attractions" | "hidden-gems" | "heritage" | "events" | "experiences";
 
@@ -43,17 +42,39 @@ export function DestinationTabs({
 }: TabPanelProps) {
   const [activeTab, setActiveTab] = useState<Tab>("attractions");
 
+  const handleTabKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLButtonElement>, index: number) => {
+      let next = index;
+      if (e.key === "ArrowRight") {
+        next = (index + 1) % tabs.length;
+      } else if (e.key === "ArrowLeft") {
+        next = (index - 1 + tabs.length) % tabs.length;
+      } else {
+        return;
+      }
+      e.preventDefault();
+      setActiveTab(tabs[next].id);
+      document.getElementById(`dest-tab-${tabs[next].id}`)?.focus();
+    },
+    [],
+  );
+
   return (
     <div>
-      <div className="mb-6 flex flex-wrap gap-2 border-b border-stone-200 pb-4">
-        {tabs.map((tab) => (
+      <div className="theme-divider mb-6 flex flex-wrap gap-2 border-b pb-4" role="tablist" aria-label="Destination details">
+        {tabs.map((tab, index) => (
           <button
             key={tab.id}
+            id={`dest-tab-${tab.id}`}
+            type="button"
+            role="tab"
+            aria-selected={activeTab === tab.id}
+            aria-controls={`dest-panel-${tab.id}`}
+            tabIndex={activeTab === tab.id ? 0 : -1}
             onClick={() => setActiveTab(tab.id)}
-            className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
-              activeTab === tab.id
-                ? "bg-amber-600 text-white"
-                : "bg-stone-100 text-stone-600 hover:bg-stone-200"
+            onKeyDown={(e) => handleTabKeyDown(e, index)}
+            className={`theme-tab rounded-lg px-4 py-2 text-sm ${
+              activeTab === tab.id ? "theme-tab-active font-semibold" : ""
             }`}
           >
             {tab.label}
@@ -61,103 +82,91 @@ export function DestinationTabs({
         ))}
       </div>
 
-      {activeTab === "attractions" && (
-        <div className="grid gap-4 sm:grid-cols-2">
-          {attractions.map((item) => (
-            <Card key={item.name}>
-              <span className="text-xs font-medium uppercase tracking-wide text-amber-600">
-                {item.category}
-              </span>
-              <h4 className="mt-1 font-semibold text-stone-900">{item.name}</h4>
-              <p className="mt-2 text-sm text-stone-600">{item.description}</p>
-              <p className="mt-2 text-xs text-stone-500">Tip: {item.tip}</p>
-            </Card>
-          ))}
-        </div>
-      )}
-
-      {activeTab === "hidden-gems" && (
-        <div className="grid gap-4 sm:grid-cols-2">
-          {hiddenGems.map((item) => (
-            <Card key={item.name}>
-              <h4 className="font-semibold text-stone-900">{item.name}</h4>
-              <p className="mt-2 text-sm text-stone-600">{item.description}</p>
-              <p className="mt-2 text-sm text-amber-700">{item.whyVisit}</p>
-              <p className="mt-2 text-xs text-stone-500">Local tip: {item.localTip}</p>
-            </Card>
-          ))}
-        </div>
-      )}
-
-      {activeTab === "heritage" && (
-        <div className="space-y-6">
-          <Card>
-            <h4 className="font-semibold text-stone-900">Cultural Significance</h4>
-            <p className="mt-2 text-sm text-stone-600">{heritage.culturalSignificance}</p>
-          </Card>
-          <div className="grid gap-4 sm:grid-cols-3">
-            <Card>
-              <h4 className="font-semibold text-stone-900">Highlights</h4>
-              <ul className="mt-2 list-inside list-disc space-y-1 text-sm text-stone-600">
-                {heritage.highlights.map((h) => (
-                  <li key={h}>{h}</li>
-                ))}
-              </ul>
-            </Card>
-            <Card>
-              <h4 className="font-semibold text-stone-900">Traditions</h4>
-              <ul className="mt-2 list-inside list-disc space-y-1 text-sm text-stone-600">
-                {heritage.traditions.map((t) => (
-                  <li key={t}>{t}</li>
-                ))}
-              </ul>
-            </Card>
-            <Card>
-              <h4 className="font-semibold text-stone-900">Etiquette Tips</h4>
-              <ul className="mt-2 list-inside list-disc space-y-1 text-sm text-stone-600">
-                {heritage.etiquetteTips.map((tip) => (
-                  <li key={tip}>{tip}</li>
-                ))}
-              </ul>
-            </Card>
+      <div role="tabpanel" id={`dest-panel-${activeTab}`} aria-labelledby={`dest-tab-${activeTab}`}>
+        {activeTab === "attractions" && (
+          <div className="grid gap-4 sm:grid-cols-2">
+            {attractions.map((item) => (
+              <div key={item.name} className="theme-card">
+                <span className="theme-badge text-[10px]">{item.category}</span>
+                <h4 className="theme-text mt-1 font-semibold">{item.name}</h4>
+                <p className="theme-text-muted mt-2 text-sm">{item.description}</p>
+                <p className="theme-text-subtle mt-2 text-xs">Tip: {item.tip}</p>
+              </div>
+            ))}
           </div>
-        </div>
-      )}
+        )}
 
-      {activeTab === "events" && (
-        <div className="grid gap-4 sm:grid-cols-2">
-          {events.map((item) => (
-            <Card key={item.name}>
-              <div className="flex items-start justify-between">
-                <h4 className="font-semibold text-stone-900">{item.name}</h4>
-                <span className="text-xs text-amber-600">{item.date}</span>
+        {activeTab === "hidden-gems" && (
+          <div className="grid gap-4 sm:grid-cols-2">
+            {hiddenGems.map((item) => (
+              <div key={item.name} className="theme-card">
+                <h4 className="theme-text font-semibold">{item.name}</h4>
+                <p className="theme-text-muted mt-2 text-sm">{item.description}</p>
+                <p className="theme-text mt-2 text-sm font-medium">{item.whyVisit}</p>
+                <p className="theme-text-subtle mt-2 text-xs">Local tip: {item.localTip}</p>
               </div>
-              <p className="mt-2 text-sm text-stone-600">{item.description}</p>
-              <p className="mt-2 text-xs text-stone-500">{item.location}</p>
-            </Card>
-          ))}
-        </div>
-      )}
+            ))}
+          </div>
+        )}
 
-      {activeTab === "experiences" && (
-        <div className="grid gap-4 sm:grid-cols-2">
-          {experiences.map((item) => (
-            <Card key={item.name}>
-              <div className="flex items-center gap-2">
-                <span className="rounded bg-stone-100 px-2 py-0.5 text-xs font-medium text-stone-600">
-                  {item.type}
-                </span>
-                <span className="text-xs text-stone-500">{item.duration}</span>
+        {activeTab === "heritage" && (
+          <div className="space-y-6">
+            <div className="theme-card">
+              <h4 className="theme-text font-semibold">Cultural Significance</h4>
+              <p className="theme-text-muted mt-2 text-sm">{heritage.culturalSignificance}</p>
+            </div>
+            <div className="grid gap-4 sm:grid-cols-3">
+              {[
+                { title: "Highlights", items: heritage.highlights },
+                { title: "Traditions", items: heritage.traditions },
+                { title: "Etiquette Tips", items: heritage.etiquetteTips },
+              ].map((section) => (
+                <div key={section.title} className="theme-card">
+                  <h4 className="theme-text font-semibold">{section.title}</h4>
+                  <ul className="theme-text-muted mt-2 list-inside list-disc space-y-1 text-sm">
+                    {section.items.map((item) => (
+                      <li key={item}>{item}</li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {activeTab === "events" && (
+          <div className="grid gap-4 sm:grid-cols-2">
+            {events.map((item) => (
+              <div key={item.name} className="theme-card">
+                <div className="flex items-start justify-between gap-2">
+                  <h4 className="theme-text font-semibold">{item.name}</h4>
+                  <span className="theme-badge text-[10px]">{item.date}</span>
+                </div>
+                <p className="theme-text-muted mt-2 text-sm">{item.description}</p>
+                <p className="theme-text-subtle mt-2 text-xs">{item.location}</p>
               </div>
-              <h4 className="mt-2 font-semibold text-stone-900">{item.name}</h4>
-              <p className="mt-2 text-sm text-stone-600">{item.description}</p>
-              <p className="mt-2 text-xs italic text-amber-700">{item.authenticityNote}</p>
-            </Card>
-          ))}
-        </div>
-      )}
+            ))}
+          </div>
+        )}
 
-      <p className="mt-6 text-center text-xs text-stone-400">
+        {activeTab === "experiences" && (
+          <div className="grid gap-4 sm:grid-cols-2">
+            {experiences.map((item) => (
+              <div key={item.name} className="theme-card">
+                <div className="flex items-center gap-2">
+                  <span className="theme-badge text-[10px]">{item.type}</span>
+                  <span className="theme-text-subtle text-xs">{item.duration}</span>
+                </div>
+                <h4 className="theme-text mt-2 font-semibold">{item.name}</h4>
+                <p className="theme-text-muted mt-2 text-sm">{item.description}</p>
+                <p className="theme-text-subtle mt-2 text-xs italic">{item.authenticityNote}</p>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <p className="theme-text-subtle mt-6 text-center text-xs">
         Cultural insights for {destinationName} powered by Gemini AI
       </p>
     </div>

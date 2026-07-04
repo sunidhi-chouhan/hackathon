@@ -48,7 +48,7 @@ export default function DiscoverPage() {
 
   if (loading) {
     return (
-      <div className="rounded-2xl border border-white/10 bg-stone-900/40 backdrop-blur-xl">
+      <div className="theme-surface rounded-2xl">
         <ParchmentSkeleton />
       </div>
     );
@@ -59,7 +59,7 @@ export default function DiscoverPage() {
       <div className="mx-auto max-w-lg">
         <ErrorState message={error} onRetry={() => router.push("/")} />
         <div className="mt-4 text-center">
-          <Link href="/" className="text-sm text-amber-400 underline hover:text-amber-300">
+          <Link href="/" className="theme-text text-sm underline-offset-4 hover:underline">
             Back to home
           </Link>
         </div>
@@ -72,12 +72,12 @@ export default function DiscoverPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="font-serif text-2xl font-bold text-white">Your Cultural Journey</h1>
-        <Link href="/" className="text-sm text-amber-400 hover:text-amber-300">
+        <h1 className="theme-text font-serif text-2xl font-bold">Your Cultural Journey</h1>
+        <Link href="/" className="theme-text text-sm underline-offset-4 hover:underline">
           ← New search
         </Link>
       </div>
-      <div className="rounded-2xl border border-white/10 bg-stone-900/40 p-4 backdrop-blur-xl sm:p-6">
+      <div className="theme-surface rounded-2xl p-4 sm:p-6">
         <CulturalResults plan={plan} />
       </div>
     </div>

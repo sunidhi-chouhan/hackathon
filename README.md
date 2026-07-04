@@ -107,7 +107,7 @@ Prompts live in `packages/ai/src/prompts/`. User input is sanitized and wrapped 
 | Area | Approach |
 |------|----------|
 | **Code quality** | Turborepo monorepo, strict TypeScript, layered packages, consistent API error handling |
-| **Testing** | Node.js test runner — schema validation, API error handler, rate limit tests (`pnpm test`) |
+| **Testing** | Node.js test runner — **48 unit tests** across schemas, API utils, AI sanitization, rate limits; CI via GitHub Actions (`pnpm test`) |
 | **Security** | Server-only API key, Zod input limits, prompt sanitization, rate limiting on POST `/api/*`, security headers |
 | **Accessibility** | Semantic HTML, form labels, ARIA tabs, `aria-pressed` toggles, skip link, `prefers-reduced-motion`, live regions |
 | **Efficiency** | Single composite AI call, Gemini JSON mode, client singleton, 55s timeout, bounded input lengths |

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { SUGGESTED_DESTINATIONS } from "@/lib/constants";
+import { filterDestinationSuggestions } from "@/lib/location-utils";
 
 interface LocationInputProps {
   value: string;
@@ -14,11 +14,7 @@ export function LocationInput({ value, onChange }: LocationInputProps) {
   const [focused, setFocused] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
 
-  const suggestions = value.trim()
-    ? SUGGESTED_DESTINATIONS.filter((d) =>
-        d.toLowerCase().includes(value.toLowerCase()),
-      ).slice(0, 6)
-    : SUGGESTED_DESTINATIONS.slice(0, 6);
+  const suggestions = filterDestinationSuggestions(value);
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {

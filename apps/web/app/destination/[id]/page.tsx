@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { LoadingState, ErrorState, Card } from "@culturecompass/ui";
+import { LoadingState, ErrorState } from "@culturecompass/ui";
 import { DestinationTabs } from "@/components/destination-tabs";
 import type { CompassPlanResponse, Destination } from "@culturecompass/shared";
 
@@ -48,7 +48,7 @@ export default function DestinationPage() {
       <div className="mx-auto max-w-lg">
         <ErrorState message={error} />
         <div className="mt-4 text-center">
-          <Link href="/" className="text-sm text-amber-700 underline">
+          <Link href="/" className="theme-text text-sm underline-offset-4 hover:underline">
             Start a new discovery
           </Link>
         </div>
@@ -63,34 +63,30 @@ export default function DestinationPage() {
   return (
     <div className="space-y-8">
       <div>
-        <Link href="/discover" className="text-sm text-amber-700 hover:text-amber-900">
+        <Link href="/" className="theme-text text-sm underline-offset-4 hover:underline">
           ← Back to results
         </Link>
         <div className="mt-4">
-          {isFeatured && (
-            <span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-800">
-              Featured Pick
-            </span>
-          )}
-          <h1 className="mt-2 text-3xl font-bold text-stone-900">{destination.name}</h1>
-          <p className="text-stone-500">{destination.country}</p>
-          <p className="mt-2 text-lg font-medium text-amber-700">{destination.tagline}</p>
+          {isFeatured && <span className="theme-badge">Featured Pick</span>}
+          <h1 className="theme-text mt-2 text-3xl font-bold">{destination.name}</h1>
+          <p className="theme-text-muted">{destination.country}</p>
+          <p className="theme-text mt-2 text-lg font-medium">{destination.tagline}</p>
         </div>
       </div>
 
-      <Card>
-        <p className="text-stone-700">{destination.rationale}</p>
-        <div className="mt-4 flex flex-wrap gap-4 text-sm text-stone-500">
+      <div className="theme-card">
+        <p className="theme-text-muted">{destination.rationale}</p>
+        <div className="theme-text-subtle mt-4 flex flex-wrap gap-4 text-sm">
           <span>Best time: {destination.bestTimeToVisit}</span>
           <span>Budget: {destination.estimatedBudget}</span>
         </div>
         <Link
           href={`/story/${destination.id}?name=${encodeURIComponent(destination.name)}`}
-          className="mt-4 inline-block text-sm font-medium text-amber-700 hover:text-amber-900"
+          className="theme-text mt-4 inline-block text-sm font-medium underline-offset-4 hover:underline"
         >
           Read immersive story →
         </Link>
-      </Card>
+      </div>
 
       {isFeatured ? (
         <DestinationTabs
@@ -102,18 +98,18 @@ export default function DestinationPage() {
           experiences={plan.experiences}
         />
       ) : (
-        <Card>
-          <p className="text-sm text-stone-600">
+        <div className="theme-card">
+          <p className="theme-text-muted text-sm">
             Detailed cultural tabs are available for your featured destination. Switch to{" "}
             <Link
               href={`/destination/${plan.featuredDestination.id}`}
-              className="font-medium text-amber-700 underline"
+              className="theme-text font-medium underline"
             >
               {plan.featuredDestination.name}
             </Link>{" "}
             for the full experience.
           </p>
-        </Card>
+        </div>
       )}
     </div>
   );
