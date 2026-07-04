@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useParams, useSearchParams } from "next/navigation";
 import { LoadingState, ErrorState, Card } from "@culturecompass/ui";
 import { fetchStory } from "@/lib/api-client";
+import { getDisplayError } from "@/lib/errors";
 import { getStoredModelPreset } from "@/lib/model-preset";
 import type { StoryResponse } from "@culturecompass/shared";
 
@@ -28,7 +29,7 @@ function StoryContent() {
         });
         setStory(result);
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to load story.");
+        setError(getDisplayError(err));
       } finally {
         setLoading(false);
       }

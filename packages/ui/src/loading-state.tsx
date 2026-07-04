@@ -5,25 +5,47 @@ interface LoadingStateProps {
 export function LoadingState({ message = "Discovering cultural treasures..." }: LoadingStateProps) {
   return (
     <div className="flex flex-col items-center justify-center gap-4 py-16">
-      <div className="h-10 w-10 animate-spin rounded-full border-4 border-amber-200 border-t-amber-600" />
-      <p className="text-sm text-stone-500">{message}</p>
+      <div
+        className="h-10 w-10 animate-spin rounded-full border-4"
+        style={{
+          borderColor: "var(--border)",
+          borderTopColor: "var(--accent)",
+        }}
+      />
+      <p className="theme-text-muted text-sm">{message}</p>
     </div>
   );
 }
 
 interface ErrorStateProps {
   message: string;
+  title?: string;
   onRetry?: () => void;
 }
 
-export function ErrorState({ message, onRetry }: ErrorStateProps) {
+export function ErrorState({
+  message,
+  title = "Something went wrong",
+  onRetry,
+}: ErrorStateProps) {
   return (
-    <div className="rounded-xl border border-red-200 bg-red-50 p-6 text-center">
-      <p className="text-sm text-red-700">{message}</p>
+    <div
+      className="rounded-xl border p-6 text-center"
+      style={{
+        borderColor: "color-mix(in srgb, #ef4444 35%, var(--border))",
+        background: "color-mix(in srgb, #ef4444 8%, var(--surface))",
+      }}
+      role="alert"
+    >
+      <p className="text-sm font-semibold" style={{ color: "var(--foreground)" }}>
+        {title}
+      </p>
+      <p className="theme-text-muted mt-2 text-sm leading-relaxed">{message}</p>
       {onRetry && (
         <button
+          type="button"
           onClick={onRetry}
-          className="mt-4 text-sm font-medium text-red-600 underline hover:text-red-800"
+          className="theme-btn-primary mt-4 px-6 py-2 text-sm"
         >
           Try again
         </button>
@@ -38,8 +60,8 @@ interface EmptyStateProps {
 
 export function EmptyState({ message }: EmptyStateProps) {
   return (
-    <div className="rounded-xl border border-dashed border-stone-300 bg-stone-50 p-12 text-center">
-      <p className="text-sm text-stone-500">{message}</p>
+    <div className="theme-card border-dashed p-12 text-center">
+      <p className="theme-text-muted text-sm">{message}</p>
     </div>
   );
 }

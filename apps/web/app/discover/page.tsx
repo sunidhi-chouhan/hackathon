@@ -7,6 +7,7 @@ import { ParchmentSkeleton } from "@/components/parchment-skeleton";
 import { CulturalResults } from "@/components/cultural-results";
 import { ErrorState } from "@culturecompass/ui";
 import { createCompassPlan } from "@/lib/api-client";
+import { getDisplayError } from "@/lib/errors";
 import type { CompassPlanRequest, CompassPlanResponse } from "@culturecompass/shared";
 
 export default function DiscoverPage() {
@@ -36,7 +37,7 @@ export default function DiscoverPage() {
         setPlan(result);
         sessionStorage.setItem("compassPlan", JSON.stringify(result));
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to generate plan.");
+        setError(getDisplayError(err));
       } finally {
         setLoading(false);
       }

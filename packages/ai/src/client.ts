@@ -1,5 +1,7 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { ZodError } from "zod";
 import type { ModelPreset } from "@culturecompass/shared";
+import { AiGenerationError, toAiGenerationError } from "./errors";
 import { resolveModelName } from "./resolveModel";
 
 let client: GoogleGenerativeAI | null = null;
@@ -7,7 +9,7 @@ let client: GoogleGenerativeAI | null = null;
 export function getGeminiClient(): GoogleGenerativeAI {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
-    throw new Error("Missing GEMINI_API_KEY in environment.");
+    throw new AiGenerationError("AI service is not configured.");
   }
 
   if (!client) {
@@ -35,23 +37,33 @@ export async function generateJson<T>(
     },
   });
 
-  let lastError: Error | null = null;
+  let lastError: AiGenerationError | null = null;
 
   for (let attempt = 0; attempt < 2; attempt++) {
     try {
       const result = await model.generateContent(prompt);
       const text = result.response.text();
       const json = extractJson(text);
-      return parse(json);
+
+      try {
+        return parse(json);
+      } catch (parseError) {
+        if (parseError instanceof ZodError) {
+          throw new AiGenerationError("AI returned an unexpected format. Please try again.", {
+            cause: parseError,
+          });
+        }
+        throw parseError;
+      }
     } catch (error) {
-      lastError = error instanceof Error ? error : new Error(String(error));
+      lastError = toAiGenerationError(error);
       if (attempt === 0) {
         await new Promise((resolve) => setTimeout(resolve, 500));
       }
     }
   }
 
-  throw lastError ?? new Error("Failed to generate content from Gemini.");
+  throw lastError ?? new AiGenerationError("Unable to generate content right now. Please try again.");
 }
 
 function extractJson(text: string): unknown {
@@ -60,9 +72,14 @@ function extractJson(text: string): unknown {
   const lastBrace = cleaned.lastIndexOf("}");
 
   if (firstBrace === -1 || lastBrace === -1 || lastBrace <= firstBrace) {
-    throw new Error("Gemini returned invalid JSON.");
+    throw new AiGenerationError("AI returned invalid JSON. Please try again.");
   }
 
   const jsonText = cleaned.slice(firstBrace, lastBrace + 1);
-  return JSON.parse(jsonText);
+
+  try {
+    return JSON.parse(jsonText);
+  } catch {
+    throw new AiGenerationError("AI returned invalid JSON. Please try again.");
+  }
 }

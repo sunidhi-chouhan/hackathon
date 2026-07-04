@@ -10,6 +10,7 @@ import {
 } from "@culturecompass/shared";
 import type { CompassPlanRequest, CompassPlanResponse, ModelPreset } from "@culturecompass/shared";
 import { createCompassPlan } from "@/lib/api-client";
+import { getDisplayError } from "@/lib/errors";
 import { INTEREST_ICONS } from "@/lib/constants";
 import { LocationInput } from "@/components/location-input";
 
@@ -71,7 +72,7 @@ export function DiscoveryForm({ onLoading, onSuccess, onError }: DiscoveryFormPr
       sessionStorage.setItem("compassPlan", JSON.stringify(result));
       onSuccess(result);
     } catch (err) {
-      onError(err instanceof Error ? err.message : "Something went wrong.");
+      onError(getDisplayError(err));
     } finally {
       setLoading(false);
     }

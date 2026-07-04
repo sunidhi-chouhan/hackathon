@@ -17,22 +17,40 @@ import type {
   ExperiencesResponse,
   ApiError,
 } from "@culturecompass/shared";
+import { ApiRequestError, resolveApiError } from "@/lib/errors";
+import { ERROR_CODES } from "@culturecompass/shared";
 
 async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
-  const response = await fetch(path, {
-    ...options,
-    headers: {
-      "Content-Type": "application/json",
-      ...options?.headers,
-    },
-  });
+  try {
+    const response = await fetch(path, {
+      ...options,
+      headers: {
+        "Content-Type": "application/json",
+        ...options?.headers,
+      },
+    });
 
-  if (!response.ok) {
-    const errorBody = (await response.json().catch(() => null)) as ApiError | null;
-    throw new Error(errorBody?.error || `Request failed with status ${response.status}`);
+    if (!response.ok) {
+      const errorBody = (await response.json().catch(() => null)) as ApiError | null;
+      throw resolveApiError(errorBody, response.status);
+    }
+
+    return response.json();
+  } catch (error) {
+    if (error instanceof ApiRequestError) {
+      throw error;
+    }
+
+    if (error instanceof TypeError) {
+      throw new ApiRequestError(
+        "Unable to reach the server. Check your connection and try again.",
+        ERROR_CODES.INTERNAL_ERROR,
+        0,
+      );
+    }
+
+    throw error;
   }
-
-  return response.json();
 }
 
 export function createCompassPlan(payload: CompassPlanRequest): Promise<CompassPlanResponse> {
